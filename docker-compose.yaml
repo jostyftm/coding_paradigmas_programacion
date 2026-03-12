@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  mozart_env:
+    # Usamos la imagen estable de Mozart 1.4.0 en lugar de compilar Mozart 2
+    image: fdekeers/mozart-1.4.0
+    container_name: mozart_oz_container
+    environment:
+      - DISPLAY=:0
+    volumes:
+      - ./src:/app
+      - /mnt/wslg/.X11-unix:/tmp/.X11-unix
+    working_dir: /app
+    # Mantiene el contenedor vivo
+    tty: true

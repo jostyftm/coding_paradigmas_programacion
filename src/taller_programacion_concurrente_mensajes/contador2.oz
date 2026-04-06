@@ -29,11 +29,9 @@ define
 
    % 3. EL CONTADOR2: Interaccion de dos puertos
    fun {Counter Output}
-      local OutPort in
-         % Creamos el puerto secundario. Su flujo es 'Output'
+      % TODO LO QUE ES DECLARACIÓN VA ANTES DEL 'in'
+      local
          OutPort = {NewPort Output}
-         
-         % Comportamiento del objeto principal
          fun {Comp Msg Estado}
             local NuevoEstado = {UpdateCount Msg Estado} in
                % Interaccion: El puerto principal le envia un mensaje al secundario
@@ -42,31 +40,32 @@ define
             end
          end
       in
-         % Retornamos el objeto puerto principal instanciado
+         % LA INSTRUCCIÓN DE RETORNO VA DESPUÉS DEL 'in'
          {NuevoObjetoPuerto Comp nil}
       end
    end
 
    % --- PRUEBA EJECUTABLE ---
-   local MiServidor FlujoSalida in
+   % AGRUPAMOS TODAS LAS DECLARACIONES AL INICIO
+   local 
+      MiServidor 
+      FlujoSalida 
+      proc {LeerFlujo S}
+         case S of Estado|T then
+            {System.showInfo "   [Output Stream] Estado actualizado:"}
+            {System.show Estado}
+            {LeerFlujo T}
+         [] nil then skip
+         end
+      end
+   in
       {System.showInfo "3. Probando Contador2 (Interaccion de Puertos)..."}
       
       % Instanciamos el servidor y extraemos su flujo de salida
       MiServidor = {Counter FlujoSalida}
       
-      % Creamos un hilo consumidor NO reactivo que lee el flujo de salida
-      thread
-         proc {LeerFlujo S}
-            case S of Estado|T then
-               {System.showInfo "   [Output Stream] Estado actualizado:"}
-               {System.show Estado}
-               {LeerFlujo T}
-            [] nil then skip
-            end
-         end
-      in
-         {LeerFlujo FlujoSalida}
-      end
+      % Levantamos el hilo consumidor NO reactivo
+      thread {LeerFlujo FlujoSalida} end
       
       % Simulamos clientes interactuando con el servidor
       {System.showInfo "-> Clientes enviando letras..."}
